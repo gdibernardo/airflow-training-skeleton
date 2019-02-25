@@ -12,11 +12,25 @@ dag = DAG(
     }
 )
 
-branching_options = ['email_joe', 'email_bob', 'email_alice']
+weekday_person_to_email = {
+    0: "Bob",  # Monday
+    1: "Joe",  # Tuesday
+    2: "Alice",  # Wednesday
+    3: "Joe",  # Thursday
+    4: "Alice",  # Friday
+    5: "Alice",  # Saturday
+    6: "Alice",  # Sunday
+}
+
+job_map = {
+    "Bob": "email_bob",
+    "Joe": "email_joe",
+    "Alice": "email_alice"
+}
 
 def _pick_a_branch(execution_date, **context):
     weekday = execution_date.weekday()
-    return weekday_person_to_email[weekday]
+    return job_map[weekday_person_to_email[weekday]]
 
 def _print_exec_date(execution_date, **context):
     print(execution_date)
@@ -35,18 +49,7 @@ branching = BranchPythonOperator(task_id='branching_operator',
 
 final_task = DummyOperator(task_id='final_task', dag=dag)
 
-for option in branching_options:
-    branching >> DummyOperator(task_id='' + option, dag=dag) >> final_task
-
-
-weekday_person_to_email = {
-    0: "Bob",  # Monday
-    1: "Joe",  # Tuesday
-    2: "Alice",  # Wednesday
-    3: "Joe",  # Thursday
-    4: "Alice",  # Friday
-    5: "Alice",  # Saturday
-    6: "Alice",  # Sunday
-}
+for key, value in job_map.items():
+    branching >> DummyOperator(task_id='' + value, dag=dag) >> final_task
 
 print_date >> branching
