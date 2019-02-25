@@ -15,8 +15,10 @@ dag = DAG(
 branching_options = ['email_joe', 'email_bob', 'email_alice']
 
 def _pick_a_branch(execution_date, **context):
-    print(execution_date.weekday())
-    return branching_options[execution_date.weekday()]
+    weekday = execution_date.weekday()
+    if weekday < len(branching_options):
+        print(execution_date.weekday())
+        return branching_options[execution_date.weekday()]
 
 def _print_exec_date(execution_date, **context):
     print(execution_date)
