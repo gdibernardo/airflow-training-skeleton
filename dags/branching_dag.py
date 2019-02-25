@@ -3,6 +3,7 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.python_operator import BranchPythonOperator
+from airflow.utils.trigger_rule import TriggerRule
 
 dag = DAG(
     dag_id="branching_dag",
@@ -49,7 +50,7 @@ branching = BranchPythonOperator(task_id='branching_operator',
 
 final_task = DummyOperator(task_id='final_task',
                            dag=dag,
-                           trigger_rule='one_success')
+                           trigger_rule=TriggerRule.ONE_SUCCESS)
 
 for key, value in job_map.items():
     branching >> DummyOperator(task_id='' + value, dag=dag) >> final_task
