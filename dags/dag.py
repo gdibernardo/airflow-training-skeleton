@@ -12,25 +12,11 @@ dag = DAG(
     },
 )
 
-# BashOperator(
-#     task_id="print_exec_date", bash_command="echo {{ execution_date }}", dag=dag
-# )
-
-sleep_1 = BashOperator(
-    task_id="sleep_1", bash_command="sleep 1", dag=dag
-)
-
-sleep_2 = BashOperator(
-    task_id="sleep_5", bash_command="sleep 5", dag=dag
-)
-
-sleep_3 = BashOperator(
-    task_id="sleep_10", bash_command="sleep 10", dag=dag
-)
-
 bash_operators = []
 for operator in [1, 5, 10]:
-    bash_operators.append(BashOperator(task_id="sleep_" + str(operator), bash_command="sleep " + str(operator), dag=dag))
+    bash_operators.append(BashOperator(task_id="sleep_" + str(operator),
+                                       bash_command="sleep " + str(operator),
+                                       dag=dag))
 
 dummy = DummyOperator(
     task_id="the_end", dag=dag
