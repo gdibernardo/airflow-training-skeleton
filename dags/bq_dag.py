@@ -15,9 +15,17 @@ dag = DAG(
 bq_fetch_data = BigQueryGetDataOperator(
     task_id='bq_fetch_data',
     sql="""
-        SELECT author.name
-        FROM `bigquery-public-data.github_repos.commits`, UNNEST(repo_name) as repo
-        WHERE repo like "apache/airflow" GROUP BY author.name order BY count(commit) DESC LIMIT 5
+        SELECT
+            author.name, count(commit) as commits
+        FROM (FLATTEN([bigquery-public-data.github_repos.commits], repo_name))
+        WHERE
+            repo_name like "apache/airflow"
+        GROUP BY
+            author.name
+        ORDER BY
+            commits DESC
+        LIMIT
+            5
         """,
     dag=dag,
     xcom_push=True,
