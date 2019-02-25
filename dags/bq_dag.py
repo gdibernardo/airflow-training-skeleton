@@ -6,7 +6,7 @@ from bq.bigquery_get_data import BigQueryGetDataOperator
 
 dag = DAG(
     dag_id='godatafest',
-    schedule_interval='@daily',
+   # schedule_interval='@daily',
     default_args={
         'owner': 'GoDataDriven',
         'start_date': airflow.utils.dates.days_ago(14)
