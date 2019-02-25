@@ -21,7 +21,8 @@ bq_fetch_data = BigQueryGetDataOperator(
         FROM (FLATTEN([bigquery-public-data.github_repos.commits], repo_name))
         WHERE
             repo_name like "apache/airflow" 
-            AND author.date = '{{ execution_date.isoformat() }}'
+            AND author.date >= '{{ execution_date.isoformat() }}'
+            AND author.date <= '{{ (execution_date + datetime.timedelta(days=1)).isoformat() }}'
         GROUP BY
             author.name
         ORDER BY
@@ -38,13 +39,13 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 
 def send_to_slack_func(execution_date, **context):
-    slack_message = execution_date + " - " + context['ti'].xcom_pull(task_ids='bq_fetch_data')
+    slack_message = context['ti'].xcom_pull(task_ids='bq_fetch_data')
 
 
     slack_operator = SlackAPIPostOperator(
         task_id='slack_operator',
         text=slack_message,
-        username="Esaurito.",
+        username="Esaurito",
         token=Variable.get("slack_access_token"),
         channel=Variable.get("slack_channel")
     )
