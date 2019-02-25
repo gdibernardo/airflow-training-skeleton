@@ -2,7 +2,7 @@ import airflow
 from airflow import DAG
 from datetime import datetime
 
-from dags.bq.bigquery_get_data import BigQueryGetDataOperator
+from bq.bigquery_get_data import BigQueryGetDataOperator
 
 dag = DAG(
     dag_id='godatafest',
