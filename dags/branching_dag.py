@@ -29,9 +29,11 @@ job_map = {
     "Alice": "email_alice"
 }
 
+
 def _pick_a_branch(execution_date, **context):
     weekday = execution_date.weekday()
     return job_map[weekday_person_to_email[weekday]]
+
 
 def _print_exec_date(execution_date, **context):
     print(execution_date)
