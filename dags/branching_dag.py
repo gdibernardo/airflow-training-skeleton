@@ -16,9 +16,7 @@ branching_options = ['email_joe', 'email_bob', 'email_alice']
 
 def _pick_a_branch(execution_date, **context):
     weekday = execution_date.weekday()
-    if weekday < len(branching_options):
-        print(execution_date.weekday())
-        return branching_options[execution_date.weekday()]
+    return weekday_person_to_email[weekday]
 
 def _print_exec_date(execution_date, **context):
     print(execution_date)
@@ -39,5 +37,16 @@ final_task = DummyOperator(task_id='final_task', dag=dag)
 
 for option in branching_options:
     branching >> DummyOperator(task_id='' + option, dag=dag) >> final_task
+
+
+weekday_person_to_email = {
+    0: "Bob",  # Monday
+    1: "Joe",  # Tuesday
+    2: "Alice",  # Wednesday
+    3: "Joe",  # Thursday
+    4: "Alice",  # Friday
+    5: "Alice",  # Saturday
+    6: "Alice",  # Sunday
+}
 
 print_date >> branching
