@@ -48,7 +48,7 @@ def send_to_slack_func(**context):
         token=Variable.get("slack_access_token"),
         channel=Variable.get("slack_channel")
     )
-    slack_operator.execute(context)
+    slack_operator.execute(context=context)
 
 
 
