@@ -5,7 +5,7 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.operators.python_operator import BranchPythonOperator
 
 dag = DAG(
-    dag_id="branching",
+    dag_id="branching_dag",
     default_args={
         "owner": "Gabriele Di Bernardo",
         "start_date": airflow.utils.dates.days_ago(14),
