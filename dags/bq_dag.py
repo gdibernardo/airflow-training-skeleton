@@ -21,8 +21,8 @@ bq_fetch_data = BigQueryGetDataOperator(
         FROM (FLATTEN([bigquery-public-data.github_repos.commits], repo_name))
         WHERE
             repo_name like "apache/airflow" 
-            AND author.date >= '{{ execution_date.isoformat() }}'
-            AND author.date <= '{{ (execution_date + datetime.timedelta(days=1)).isoformat() }}'
+            AND author.date >= '{{ execution_date }}'
+            AND author.date <= '{{ next_execution_date }}'
         GROUP BY
             author.name
         ORDER BY
