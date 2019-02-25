@@ -28,6 +28,10 @@ sleep_3 = BashOperator(
     task_id="sleep_10", bash_command="sleep 10", dag=dag
 )
 
+bash_operators = []
+for operator in [1, 5, 10]:
+    bash_operators.append(BashOperator(task_id="sleep_" + str(operator), bash_command="sleep " + str(operator), dag=dag))
+
 dummy = DummyOperator(
     task_id="the_end", dag=dag
 )
@@ -41,4 +45,4 @@ print_date = PythonOperator(
     provide_context=True,
     dag=dag)
 
-print_date >> [sleep_1, sleep_2, sleep_3] >> dummy
+print_date >> bash_operators >> dummy
