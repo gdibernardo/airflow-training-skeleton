@@ -36,4 +36,6 @@ branching = BranchPythonOperator(task_id='branching_operator',
 final_task = DummyOperator(task_id='final_task', dag=dag)
 
 for option in branching_options:
-    print_date >> branching >> DummyOperator(task_id=option, dag=dag) >> final_task
+    branching >> DummyOperator(task_id='' + option, dag=dag) >> final_task
+
+print_date >> branching
