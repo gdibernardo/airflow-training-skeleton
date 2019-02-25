@@ -20,7 +20,8 @@ bq_fetch_data = BigQueryGetDataOperator(
             author.name, count(commit) as commits
         FROM (FLATTEN([bigquery-public-data.github_repos.commits], repo_name))
         WHERE
-            repo_name like "apache/airflow"
+            repo_name like "apache/airflow" 
+            AND author.date = '{{ execution_date.isoformat() }}'
         GROUP BY
             author.name
         ORDER BY
@@ -35,9 +36,6 @@ bq_fetch_data = BigQueryGetDataOperator(
 
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
-
-
-
 
 def send_to_slack_func(**context):
     slack_message = context['ti'].xcom_pull(task_ids='bq_fetch_data')
