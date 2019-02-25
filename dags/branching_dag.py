@@ -47,7 +47,9 @@ branching = BranchPythonOperator(task_id='branching_operator',
                                  provide_context=True,
                                  dag=dag)
 
-final_task = DummyOperator(task_id='final_task', dag=dag)
+final_task = DummyOperator(task_id='final_task',
+                           dag=dag,
+                           trigger_rule='one_success')
 
 for key, value in job_map.items():
     branching >> DummyOperator(task_id='' + value, dag=dag) >> final_task
