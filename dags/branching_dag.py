@@ -21,13 +21,14 @@ def _pick_a_branch(execution_date, **context):
 def _print_exec_date(execution_date, **context):
     print(execution_date)
 
+
 print_date = PythonOperator(
-    task_id="print_execution_date",
+    task_id="print_branching_date",
     python_callable=_print_exec_date,
     provide_context=True,
     dag=dag)
 
-branching = BranchPythonOperator(task_id='branching',
+branching = BranchPythonOperator(task_id='branching_operator',
                                  python_callable=_pick_a_branch,
                                  provide_context=True,
                                  dag=dag)
