@@ -1,6 +1,5 @@
 import airflow
 from airflow import DAG
-from datetime import datetime
 
 from bq.bigquery_get_data import BigQueryGetDataOperator
 
