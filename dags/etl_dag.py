@@ -21,8 +21,8 @@ pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
          WHERE transfer_date >= date '{{ execution_date }}'
           AND transfer_date < date '{{ next_execution_date }}'
           """,
-    bucket= "gs://gabriele-bucket",
-    filename= "pg_export",
+    bucket="gabriele-bucket",
+    filename="pg_export_{{ execution_date }}",
     dag=dag,
 )
 
