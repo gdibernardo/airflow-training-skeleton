@@ -31,7 +31,8 @@ http_to_gcs = HttpToGcsOperator(task_id="http_to_gcs",
                                 http_conn_id="http_connection",
                                 endpoint="/convert-currency?date={{ ds }}&from=GBP&to=EUR",
                                 bucket="gabriele-bucket",
-                                filename="currency/{{ ds }}/change")
+                                filename="currency/{{ ds }}/change",
+                                dag=dag)
 
 dummy_end = DummyOperator(
     task_id="the_end", dag=dag
