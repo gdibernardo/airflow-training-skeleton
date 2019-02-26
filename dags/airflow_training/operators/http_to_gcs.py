@@ -40,6 +40,7 @@ class HttpToGcsOperator(BaseOperator):
     def execute(self, context):
         http_response = self._http_get()
         file_handle = self._write_local_data_files(http_response)
+        file_handle.flush()
         self._upload_to_gcs(file_handle)
 
     def _http_get(self):
@@ -59,7 +60,7 @@ class HttpToGcsOperator(BaseOperator):
             delegate_to=self.delegate_to,
         )
 
-        hook.upload(self.bucket, file_to_upload, self.filename, "application/json")
+        hook.upload(self.bucket, self.filename, file_to_upload.name, "application/json")
 
     def _write_local_data_files(self, json_content):
         """
