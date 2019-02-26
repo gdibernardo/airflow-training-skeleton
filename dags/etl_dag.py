@@ -101,7 +101,9 @@ land_registry_prices_to_bigquery = DataFlowPythonOperator(
         'table': 'registry',
         'dataset': 'prices',
         'project': PROJECT_ID,
-        'job_name': '{{ task_instance_key_str }}'
+        'staging_location':'gs://gabriele-bucket/stg_location/',
+        'temp_location': 'gs://gabriele-bucket/temp_location/',
+        'job_name': '{{ task_instance_key_str }}',
     },
     py_file="gs://europe-west1-training-airfl-67643e8c-bucket/dataflow_job.py",
     dag=dag,
