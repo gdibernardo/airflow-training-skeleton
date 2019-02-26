@@ -47,7 +47,7 @@ class HttpToGcsOperator(BaseOperator):
 
         self.log.info("Calling HTTP method")
 
-        return http.run(self.endpoint)
+        return http.run(self.endpoint).text
 
     def _upload_to_gcs(self, file_to_upload):
         """
