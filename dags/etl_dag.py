@@ -84,7 +84,7 @@ from airflow_training.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOpe
 write_to_bq = GoogleCloudStorageToBigQueryOperator(
     task_id="write_to_bq",
     bucket="gabriele-bucket",
-    source_objects=["average_prices/{{ ds }}/*"],
+    source_objects=["average_prices/{{ ds }}/*.parquet"],
     destination_project_dataset_table=PROJECT_ID + ":prices.land_registry_price${{ ds_nodash }}",
     source_format="PARQUET",
     write_disposition="WRITE_TRUNCATE",
