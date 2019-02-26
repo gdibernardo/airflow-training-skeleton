@@ -5,6 +5,8 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow_training.operators.postgres_to_gcs import PostgresToGoogleCloudStorageOperator
 from airflow_training.operators.http_to_gcs import HttpToGcsOperator
 
+from airflow.contrib.operators.dataflow_operator import DataFlowPythonOperator
+
 PROJECT_ID = 'airflowbolcom-58aea67718d62a47'
 
 dag = DAG(
@@ -90,9 +92,26 @@ write_to_bq = GoogleCloudStorageToBigQueryOperator(
     write_disposition="WRITE_TRUNCATE",
 dag=dag, )
 
+
+land_registry_prices_to_bigquery = DataFlowPythonOperator(
+    task_id="land_registry_prices_to_bigquery",
+    dataflow_default_options={
+        'region': "europe-west1",
+        'input': 'gs://gabriele-bucket/pg_export/{{ ds }}/*.json',
+        'table': 'registry',
+        'dataset': 'prices',
+        'project': PROJECT_ID,
+        'job_name': '{{ task_instance_key_str }}'
+    },
+    py_file="gs://europe-west1-training-airfl-67643e8c-bucket/dataflow_job.py",
+    dag=dag,
+)
+
 pgsl_to_gcs >> dataproc_create_cluster
 
 http_to_gcs_ops >> dataproc_create_cluster
+
+http_to_gcs_ops >> land_registry_prices_to_bigquery >> dummy_end
 
 dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster >> dummy_end
 
