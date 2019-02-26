@@ -23,7 +23,7 @@ pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
           AND transfer_date < date '{{ next_execution_date }}'
           """,
     bucket="gabriele-bucket",
-    filename="pg_export/{{ ds }}/properties_{}",
+    filename="pg_export/{{ ds }}/properties_{}.json",
     dag=dag,
 )
 
@@ -33,7 +33,7 @@ for currency in {'EUR', 'USD'}:
                                 http_conn_id="http_connection",
                                 endpoint="/convert-currency?date={{ ds }}&from=GBP&to=" + currency,
                                 bucket="gabriele-bucket",
-                                filename="currency/{{ ds }}/" + currency + "/change",
+                                filename="currency/{{ ds }}/" + currency + ".json",
                                 dag=dag)
     http_to_gcs_ops.append(http_to_gcs)
 
