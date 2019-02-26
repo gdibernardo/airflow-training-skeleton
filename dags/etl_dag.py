@@ -79,8 +79,21 @@ dataproc_delete_cluster = DataprocClusterDeleteOperator(
     trigger_rule=TriggerRule.ALL_DONE,
 dag=dag, )
 
+from airflow_training.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOperator
+
+write_to_bq = GoogleCloudStorageToBigQueryOperator(
+    task_id="write_to_bq",
+    bucket="gabriele-bucket",
+    source_objects=["average_prices/{{ ds }}/*"],
+    destination_project_dataset_table=PROJECT_ID + "prices.land_registry_price${{ ds_nodash }}",
+    source_format="PARQUET",
+    write_disposition="WRITE_TRUNCATE",
+dag=dag, )
+
 pgsl_to_gcs >> dataproc_create_cluster
 
 http_to_gcs_ops >> dataproc_create_cluster
 
-dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster >>  dummy_end
+dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster
+
+dataproc_delete_cluster >> write_to_bq >> dummy_end
