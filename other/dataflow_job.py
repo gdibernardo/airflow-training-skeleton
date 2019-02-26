@@ -16,16 +16,16 @@ def run(argv=None):
     parser.add_argument(
         "--input",
         dest="input",
-        default="gs://airflow-training-data/land_registry_price_paid_uk/*/*.json",
+        default="gs://gabriele-bucket/pg_export/{{ ds }}/*.json",
         help="Input file to process.",
     )
     known_args, pipeline_args = parser.parse_known_args(argv)
     pipeline_args.extend(
         [
             "--runner=DataflowRunner",
-            "--project=gdd-airflow-training",
-            "--staging_location=gs://airflow-training-data/dataflow-staging",
-            "--temp_location=gs://airflow-training-data/dataflow-temp",
+            "--project=airflowbolcom-58aea67718d62a47",
+            "--staging_location=gs://europe-west1-training-airfl-67643e8c-bucket/dataflow-staging",
+            "--temp_location=gs://europe-west1-training-airfl-67643e8c-bucket/dataflow-temp",
             "--job_name=gcs-gzcomp-to-bq1",
         ]
     )
@@ -39,7 +39,7 @@ def run(argv=None):
             | WriteToBigQuery(
                 "result_table",
                 dataset="result_dataset",
-                project="gdd-airflow-training",
+                project="airflowbolcom-58aea67718d62a47",
                 schema="city:string, "
                        "county:string, "
                        "district:string, "
