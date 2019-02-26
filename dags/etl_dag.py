@@ -18,8 +18,8 @@ pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
     postgres_conn_id= "pg_connection",
     sql= """SELECT * 
          FROM public.land_registry_price_paid_uk
-         WHERE transfer_date >= date ''{{ execution_date }}''
-          AND transfer_date < date ''{{ next_execution_date }}''
+         WHERE transfer_date >= date '{{ execution_date }}'
+          AND transfer_date < date '{{ next_execution_date }}'
           """,
     bucket= "gs://gabriele-bucket",
     filename= "pg_export",
