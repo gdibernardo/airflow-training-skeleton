@@ -22,7 +22,7 @@ import json
 from airflow.contrib.hooks.gcs_hook import GoogleCloudStorageHook
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
-from godatadriven.hooks.bigquery_hook import BigQueryHook
+from airflow_training.hooks.bigquery_hook import BigQueryHook
 
 
 class GoogleCloudStorageToBigQueryOperator(BaseOperator):
