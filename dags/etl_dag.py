@@ -58,29 +58,29 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
     dag=dag,
 )
 
-# compute_aggregates = DataProcPySparkOperator(
-#     task_id='compute_aggregates',
-#     main='gs://gdd-training/build_statistics.py',
-#     cluster_name='analyse-pricing-{{ ds }}',
-#     arguments=[
-#     "gs://gabriele-bucket/pg_export/{{ ds }}/*.json",
-#     "gs://gabriele-bucket/currency/{{ ds }}/*.json",
-#     "gs://gabriele-bucket/average_prices/{{ ds }}/"
-# ],
-#
-# dag=dag, )
-#
-#
-# from airflow.utils.trigger_rule import TriggerRule
-# dataproc_delete_cluster = DataprocClusterDeleteOperator(
-#     task_id="delete_dataproc",
-#     cluster_name="analyse-pricing-{{ ds }}",
-#     project_id=PROJECT_ID,
-#     trigger_rule=TriggerRule.ALL_DONE,
-# dag=dag, )
+compute_aggregates = DataProcPySparkOperator(
+    task_id='compute_aggregates',
+    main='gs://europe-west1-training-airfl-67643e8c-bucket/build_statistics.py',
+    cluster_name='analyse-pricing-{{ ds }}',
+    arguments=[
+    "gs://gabriele-bucket/pg_export/{{ ds }}/*.json",
+    "gs://gabriele-bucket/currency/{{ ds }}/*.json",
+    "gs://gabriele-bucket/average_prices/{{ ds }}/"
+],
+
+dag=dag, )
+
+
+from airflow.utils.trigger_rule import TriggerRule
+dataproc_delete_cluster = DataprocClusterDeleteOperator(
+    task_id="delete_dataproc",
+    cluster_name="analyse-pricing-{{ ds }}",
+    project_id=PROJECT_ID,
+    trigger_rule=TriggerRule.ALL_DONE,
+dag=dag, )
 
 pgsl_to_gcs >> dataproc_create_cluster
 
 http_to_gcs_ops >> dataproc_create_cluster
 
-dataproc_create_cluster >> dummy_end
+dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster >>  dummy_end
