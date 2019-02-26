@@ -3,6 +3,7 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 
 from airflow_training.operators.postgres_to_gcs import PostgresToGoogleCloudStorageOperator
+from airflow_training.operators.http_to_gcs import HttpToGcsOperator
 
 dag = DAG(
     dag_id='etl',
@@ -26,8 +27,14 @@ pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
     dag=dag,
 )
 
+http_to_gcs = HttpToGcsOperator(task_id="http_to_gcs",
+                                http_conn_id="http_connection",
+                                endpoint="/convert-currency?date={{ ds }}&from=GBP&to=EUR",
+                                bucket="gabriele-bucket",
+                                filename="currency/{{ ds }}/change")
+
 dummy_end = DummyOperator(
     task_id="the_end", dag=dag
 )
 
-pgsl_to_gcs >> dummy_end
+pgsl_to_gcs >> http_to_gcs >> dummy_end
