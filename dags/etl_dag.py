@@ -94,6 +94,6 @@ pgsl_to_gcs >> dataproc_create_cluster
 
 http_to_gcs_ops >> dataproc_create_cluster
 
-dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster
+dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster >> dummy_end
 
-dataproc_delete_cluster >> write_to_bq >> dummy_end
+compute_aggregates >> write_to_bq >> dummy_end
