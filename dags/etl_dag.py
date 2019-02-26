@@ -5,6 +5,8 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow_training.operators.postgres_to_gcs import PostgresToGoogleCloudStorageOperator
 from airflow_training.operators.http_to_gcs import HttpToGcsOperator
 
+PROJECT_ID = 'airflowbolcom-58aea67718d62a47'
+
 dag = DAG(
     dag_id='etl',
     schedule_interval='@daily',
@@ -41,4 +43,44 @@ dummy_end = DummyOperator(
     task_id="the_end", dag=dag
 )
 
-pgsl_to_gcs >> http_to_gcs_ops >> dummy_end
+from airflow.contrib.operators.dataproc_operator import (
+    DataprocClusterCreateOperator,
+    DataprocClusterDeleteOperator,
+    DataProcPySparkOperator,
+)
+
+dataproc_create_cluster = DataprocClusterCreateOperator(
+    task_id="create_dataproc",
+    cluster_name="analyse-pricing-{{ ds }}",
+    project_id=PROJECT_ID,
+    num_workers=2,
+    zone="europe-west4-a",
+    dag=dag,
+)
+
+# compute_aggregates = DataProcPySparkOperator(
+#     task_id='compute_aggregates',
+#     main='gs://gdd-training/build_statistics.py',
+#     cluster_name='analyse-pricing-{{ ds }}',
+#     arguments=[
+#     "gs://gabriele-bucket/pg_export/{{ ds }}/*.json",
+#     "gs://gabriele-bucket/currency/{{ ds }}/*.json",
+#     "gs://gabriele-bucket/average_prices/{{ ds }}/"
+# ],
+#
+# dag=dag, )
+#
+#
+# from airflow.utils.trigger_rule import TriggerRule
+# dataproc_delete_cluster = DataprocClusterDeleteOperator(
+#     task_id="delete_dataproc",
+#     cluster_name="analyse-pricing-{{ ds }}",
+#     project_id=PROJECT_ID,
+#     trigger_rule=TriggerRule.ALL_DONE,
+# dag=dag, )
+
+pgsl_to_gcs >> dataproc_create_cluster
+
+http_to_gcs_ops >> dataproc_create_cluster
+
+dataproc_create_cluster >> dummy_end
