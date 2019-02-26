@@ -14,7 +14,7 @@ dag = DAG(
     schedule_interval='@daily',
     default_args={
         'owner': 'Gabriele',
-        'start_date': airflow.utils.dates.days_ago(14),
+        'start_date': airflow.utils.dates.days_ago(14)
     }
 )
 
@@ -28,8 +28,7 @@ pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
           """,
     bucket="gabriele-bucket",
     filename="pg_export/{{ ds }}/properties_{}.json",
-    dag=dag,
-)
+    dag=dag)
 
 http_to_gcs_ops = []
 for currency in {'EUR', 'USD'}:
@@ -42,14 +41,12 @@ for currency in {'EUR', 'USD'}:
     http_to_gcs_ops.append(http_to_gcs)
 
 dummy_end = DummyOperator(
-    task_id="the_end", dag=dag
-)
+    task_id="the_end", dag=dag)
 
 from airflow.contrib.operators.dataproc_operator import (
     DataprocClusterCreateOperator,
     DataprocClusterDeleteOperator,
-    DataProcPySparkOperator,
-)
+    DataProcPySparkOperator)
 
 dataproc_create_cluster = DataprocClusterCreateOperator(
     task_id="create_dataproc",
@@ -57,8 +54,7 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
     project_id=PROJECT_ID,
     num_workers=2,
     zone="europe-west4-a",
-    dag=dag,
-)
+    dag=dag)
 
 compute_aggregates = DataProcPySparkOperator(
     task_id='compute_aggregates',
@@ -68,9 +64,8 @@ compute_aggregates = DataProcPySparkOperator(
     "gs://gabriele-bucket/pg_export/{{ ds }}/*.json",
     "gs://gabriele-bucket/currency/{{ ds }}/*.json",
     "gs://gabriele-bucket/average_prices/{{ ds }}/"
-],
-
-dag=dag, )
+    ],
+    dag=dag)
 
 
 from airflow.utils.trigger_rule import TriggerRule
@@ -79,7 +74,7 @@ dataproc_delete_cluster = DataprocClusterDeleteOperator(
     cluster_name="analyse-pricing-{{ ds }}",
     project_id=PROJECT_ID,
     trigger_rule=TriggerRule.ALL_DONE,
-dag=dag, )
+    dag=dag)
 
 from airflow_training.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOperator
 
@@ -90,7 +85,7 @@ write_to_bq = GoogleCloudStorageToBigQueryOperator(
     destination_project_dataset_table=PROJECT_ID + ":prices.land_registry_price${{ ds_nodash }}",
     source_format="PARQUET",
     write_disposition="WRITE_TRUNCATE",
-dag=dag, )
+    dag=dag)
 
 
 land_registry_prices_to_bigquery = DataFlowPythonOperator(
@@ -106,8 +101,7 @@ land_registry_prices_to_bigquery = DataFlowPythonOperator(
         'job_name': '{{ task_instance_key_str }}',
     },
     py_file="gs://europe-west1-training-airfl-67643e8c-bucket/dataflow_job.py",
-    dag=dag,
-)
+    dag=dag)
 
 pgsl_to_gcs >> dataproc_create_cluster
 
